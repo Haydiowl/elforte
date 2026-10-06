@@ -1,0 +1,161 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,100..1000&display=swap');
+@import "tailwindcss";
+
+:root {
+  --brand-navy: #09123c;
+  --brand-red: #cc091b;
+  --brand-sky: #d6eeff;
+  --text-main: #09123c;
+  --text-muted: #4a556a;
+  --container-max: 1200px;
+}
+
+body {
+  font-family: "Google Sans Flex", "Inter", sans-serif;
+  color: var(--text-main);
+  background: #fff;
+  margin: 0;
+}
+
+.font-sans {
+  font-family: "Google Sans Flex", "Inter", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  line-height: 1.02;
+}
+
+/* Keep content cards consistent across the page. */
+div[class*="rounded-2xl"],
+div[class*="rounded-3xl"],
+div[class*="rounded-["] {
+  border-radius: 12px;
+}
+
+.grid-bg {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--brand-sky);
+  background-image:
+    linear-gradient(to right, rgba(147, 196, 230, 0.15) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(147, 196, 230, 0.15) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.grid-bg::after,
+.benefits-grid::after,
+.footer-grid::after {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 42px;
+  pointer-events: none;
+  content: "";
+  opacity: 0.9;
+  filter: blur(3px);
+}
+
+.grid-bg::after {
+  background: linear-gradient(to bottom, transparent, var(--brand-sky));
+}
+
+.benefits-grid {
+  position: relative;
+  overflow: hidden;
+  background-color: #050948;
+  background-image:
+    linear-gradient(to right, rgba(46, 68, 145, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(46, 68, 145, 0.12) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.benefits-grid::after {
+  background: linear-gradient(to bottom, transparent, #050948);
+}
+
+.footer-grid {
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.015) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.footer-grid::after {
+  background: linear-gradient(to bottom, transparent, #fff);
+}
+
+.footer-scene {
+  min-height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 2.25rem !important;
+  }
+
+  h2 {
+    font-size: 1.8rem !important;
+  }
+
+  h3 {
+    font-size: 1.15rem !important;
+  }
+
+  #about-us .grid {
+    text-align: center;
+  }
+
+  #about-us .grid > div {
+    align-items: center;
+  }
+}
+
+.glow-pink {
+  filter: drop-shadow(0 0 40px rgba(236, 72, 153, 0.6));
+}
+
+.container-site {
+  width: min(100% - 3rem, var(--container-max));
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .container-site {
+    width: min(100% - 1.5rem, var(--container-max));
+  }
+}
+
+.scroll-mt-nav {
+  scroll-margin-top: 80px;
+}
