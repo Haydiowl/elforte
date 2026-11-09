@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { createClient, createInquiry, getClients } from "../lib/db";
 
 interface Values {
   name: string;
@@ -63,6 +64,27 @@ export default function ContactForm() {
     setStatus("sending");
     timers.current.push(
       window.setTimeout(() => {
+        // Store client + inquiry in repository so admin can manage them
+        const existingClient = getClients().find((c) => c.email.toLowerCase() === values.email.trim().toLowerCase());
+        const client = existingClient ?? createClient({
+          name: values.name.trim(),
+          email: values.email.trim(),
+          phone: values.phone.trim(),
+          company: "",
+          source: "Contact Form",
+          status: "New",
+          assignedStaffId: null,
+          interestedPropertyIds: [],
+          notes: "",
+        });
+        createInquiry({
+          clientId: client.id,
+          propertyId: null,
+          message: values.message.trim(),
+          source: "Contact Form",
+          status: "New",
+          assignedStaffId: null,
+        });
         window.location.href = buildMailtoLink(values);
         setStatus("ready");
       }, 600)

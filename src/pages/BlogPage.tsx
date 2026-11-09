@@ -1,8 +1,9 @@
 import { BlogGrid, BlogHero } from "../components/blogCards";
 import { FooterScene, SiteNav } from "../components/site";
-import { articles } from "../data/articles";
+import { getArticles } from "../lib/db";
 
 export default function BlogPage() {
+  const articles = getArticles();
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#cc091b]/10 selection:text-[#cc091b]">
       <SiteNav />

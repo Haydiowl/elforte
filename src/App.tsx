@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import AdminRouter from "./admin/AdminRouter";
 import BlogPage from "./pages/BlogPage";
 import BlogPostPage from "./pages/BlogPostPage";
 import ContactPage from "./pages/ContactPage";
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/blog/:slug" element={<BlogPostPage showBack />} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/admin/*" element={<AdminRouter />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
     </BrowserRouter>

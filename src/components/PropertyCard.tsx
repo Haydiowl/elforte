@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import type { Property } from "../data/properties";
+import type { Property } from "../lib/types";
 
 export default function PropertyCard({ property, compact = false }: { property: Property; compact?: boolean }) {
-  const soldOut = property.status === "closed";
+  const soldOut = property.status === "Closed" || property.status === "Sold";
 
   return (
     <article className="flex flex-col">
@@ -12,7 +12,7 @@ export default function PropertyCard({ property, compact = false }: { property: 
         aria-label={`View ${property.name}`}
       >
         <img
-          src={property.image}
+          src={property.featuredImage}
           alt={property.name}
           className={`aspect-[437/412] h-auto w-full object-cover transition-transform duration-500 hover:scale-[1.03] ${
             soldOut ? "grayscale" : ""
@@ -61,9 +61,9 @@ export default function PropertyCard({ property, compact = false }: { property: 
         </div>
 
         {compact ? null : (
-          <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#4a556a]">
-            {property.description}
-          </p>
+            <p className="mt-3 flex-1 text-[14px] leading-[1.6] text-[#4a556a]">
+              {property.shortDescription}
+            </p>
         )}
 
         <div className="mt-4">

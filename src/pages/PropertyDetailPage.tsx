@@ -1,11 +1,17 @@
 import { Link, useParams } from "react-router-dom";
+import InspectionBookingForm from "../components/InspectionBookingForm";
 import PropertyCard from "../components/PropertyCard";
 import { Button, FaqSection, FooterScene, SiteNav } from "../components/site";
-import { getProperty, properties } from "../data/properties";
+import { getProperties } from "../lib/db";
+import type { Property } from "../lib/types";
+
+function getPropertyBySlug(slug: string | undefined): Property | undefined {
+  return getProperties().find((p) => p.slug === slug);
+}
 
 export default function PropertyDetailPage() {
   const { slug } = useParams();
-  const property = getProperty(slug);
+  const property = getPropertyBySlug(slug);
 
   if (!property) {
     return (
@@ -30,8 +36,20 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const { detail } = property;
-  const soldOut = property.status === "closed";
+  const detail = property.detail ?? {
+    heroImage: property.featuredImage,
+    aboutTitle: `About ${property.name}`,
+    about: [property.shortDescription, property.description].filter(Boolean),
+    whyTitle: "Why this property?",
+    why: [],
+    whoTitle: "Who is it for?",
+    whoIntro: "Suitable for:",
+    who: [],
+    moveTitle: "Next steps",
+    move: [],
+  };
+  const soldOut = property.status === "Closed" || property.status === "Sold";
+  const related = getProperties().filter((p) => p.slug !== property.slug);
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#cc091b]/10 selection:text-[#cc091b]">
@@ -41,7 +59,7 @@ export default function PropertyDetailPage() {
       <section className="benefits-grid py-14 sm:py-16">
         <div className="container-site relative z-10 text-center">
           <h1 className="mx-auto max-w-[820px] text-[36px] font-semibold leading-[1.1] tracking-[-0.04em] text-white sm:text-5xl lg:text-[64px] lg:leading-[71px]">
-            {property.displayName}
+            {property.name}
           </h1>
           <p className="mx-auto mt-4 max-w-[616px] text-[16px] leading-[1.4] text-[#b8cadf] sm:text-[20px] sm:leading-[28px]">
             Each opportunity below is selected based on location potential, land use value, and long-term growth outlook.
@@ -50,12 +68,12 @@ export default function PropertyDetailPage() {
             {soldOut ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-[#cc091b] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
                 <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                {property.statusLabel}
+                {property.status}
               </span>
             ) : (
               <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-white">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />
-                {property.statusLabel}
+                {property.status}
               </span>
             )}
           </div>
@@ -80,7 +98,7 @@ export default function PropertyDetailPage() {
               <div className="overflow-hidden rounded-xl">
                 <img
                   src={detail.heroImage}
-                  alt={property.displayName}
+                  alt={property.name}
                   className={`aspect-[1118/797] w-full object-cover lg:aspect-[678/777] ${
                     soldOut ? "grayscale" : ""
                   }`}
@@ -126,22 +144,46 @@ export default function PropertyDetailPage() {
                 {soldOut ? (
                   <div className="flex flex-col gap-3">
                     <span className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full bg-[#94a3b8] px-6 py-4 text-[15px] font-bold text-white opacity-80">
-                      Sold out — {property.statusLabel}
+                      Sold out — {property.status}
                     </span>
                     <Button to="/properties" variant="outline" className="w-full py-4">
                       Explore available properties
                     </Button>
                   </div>
                 ) : (
-                  <Button href="https://wa.me/2349056592894" className="w-full py-4 text-[15px]">
+                  <a
+                    href="#book-inspection"
+                    className="inline-flex w-full items-center justify-center rounded-full bg-[#cc091b] px-6 py-4 text-[15px] font-bold text-white transition-all hover:bg-[#b50818] active:scale-[0.99]"
+                  >
                     Book an Inspection
-                  </Button>
+                  </a>
                 )}
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Book inspection — creates an Inspection record in the admin repository */}
+      {!soldOut && (
+        <section id="book-inspection" className="scroll-mt-nav bg-white py-14 sm:py-16">
+          <div className="container-site grid items-start gap-8 lg:grid-cols-[1fr_592px]">
+            <div className="max-w-[484px]">
+              <span className="inline-flex items-center rounded-full bg-[#eaf4fc] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-[#09123c]">
+                Book Inspection
+              </span>
+              <h2 className="mt-4 text-[28px] font-semibold leading-tight tracking-[-0.02em] text-[#09123c] sm:text-[36px]">
+                See {property.name} in person
+              </h2>
+              <p className="mt-3 max-w-[440px] text-[15px] leading-[1.6] text-[#4a556a]">
+                Pick a date and time that works for you. Your request goes straight to our team, who will confirm
+                your visit.
+              </p>
+            </div>
+            <InspectionBookingForm propertyId={property.id} propertyName={property.name} />
+          </div>
+        </section>
+      )}
 
       {/* Related properties — same card system, compact, per Figma */}
       <section className="bg-[#D6EEFF] py-14 sm:py-16">
@@ -150,7 +192,7 @@ export default function PropertyDetailPage() {
             Related properties
           </h2>
           <div className="mt-8 grid gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-            {properties.map((p) => (
+            {related.map((p) => (
               <PropertyCard key={p.slug} property={p} compact />
             ))}
           </div>

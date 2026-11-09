@@ -1,22 +1,26 @@
 import { useMemo, useState } from "react";
 import PropertyCard from "../components/PropertyCard";
 import { FaqSection, FooterScene, SiteNav } from "../components/site";
-import { categoryOptions, landOptions, properties } from "../data/properties";
+import { getProperties } from "../lib/db";
+
+const landOptions = ["Land", "Buildings", "Shops"];
+const categoryOptions = ["Buy", "Sale", "Rent"];
 
 export default function PropertiesPage() {
   const [land, setLand] = useState("Land");
   const [category, setCategory] = useState("Buy");
   const [query, setQuery] = useState("");
 
+  const allProperties = getProperties();
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return properties.filter((p) => {
-      if (p.landType !== land) return false;
-      if (p.category !== category) return false;
-      if (q && !`${p.name} ${p.location} ${p.description}`.toLowerCase().includes(q)) return false;
+    return allProperties.filter((p) => {
+      if (p.propertyType !== land) return false;
+      if (q && !`${p.name} ${p.location} ${p.shortDescription}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [land, category, query]);
+  }, [land, category, query, allProperties]);
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#cc091b]/10 selection:text-[#cc091b]">

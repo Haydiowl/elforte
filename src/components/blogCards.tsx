@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Article } from "../data/articles";
+import type { Blog } from "../lib/types";
 
 // --- BlogHero: dark navy band with centered title, per Figma ---
 export function BlogHero({ title, subtitle }: { title: string; subtitle: string }) {
@@ -17,13 +17,13 @@ export function BlogHero({ title, subtitle }: { title: string; subtitle: string 
   );
 }
 
-// --- ArticleCard: tag pill + title + excerpt + Read article + image, per Figma ---
-export function ArticleCard({ article }: { article: Article }) {
+// --- ArticleCard: category pill + title + excerpt + Read article + image ---
+export function ArticleCard({ article }: { article: Blog }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-xl border border-[#e3e9f0] bg-white p-5 sm:p-6">
       <div className="flex flex-1 flex-col">
         <span className="inline-block self-start rounded-full bg-[#eaf4fc] px-4 py-1 text-[11px] font-semibold text-[#355672]">
-          {article.tag}
+          {article.category}
         </span>
         <Link to={`/blog/${article.slug}`} className="mt-4">
           <h3 className="text-[17px] font-bold leading-snug text-[#09123c] transition-colors group-hover:text-[#cc091b]">
@@ -42,7 +42,7 @@ export function ArticleCard({ article }: { article: Article }) {
       </div>
       <Link to={`/blog/${article.slug}`} className="mt-5 block overflow-hidden rounded-lg" aria-label={`Read: ${article.title}`}>
         <img
-          src={article.image}
+          src={article.featuredImage}
           alt={article.title}
           className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           loading="lazy"
@@ -52,8 +52,8 @@ export function ArticleCard({ article }: { article: Article }) {
   );
 }
 
-// --- BlogGrid: 1-col mobile, 2-col tablet, 3-col desktop, per Figma ---
-export function BlogGrid({ items }: { items: Article[] }) {
+// --- BlogGrid: 1-col mobile, 2-col tablet, 3-col desktop ---
+export function BlogGrid({ items }: { items: Blog[] }) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {items.map((a) => (

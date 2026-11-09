@@ -1,61 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import { ArticleCard } from "../components/blogCards";
 import { FooterScene, SiteNav } from "../components/site";
-import { articles, getArticle, type Article } from "../data/articles";
+import { getArticles } from "../lib/db";
+import type { Blog } from "../lib/types";
 
-function ArticleBody({ article }: { article: Article }) {
-  // Structured Figma-style sections when present, plain paragraphs otherwise.
-  if (article.sections && article.sections.length > 0) {
-    return (
-      <div>
-        {article.intro?.map((p, i) => (
-          <p key={i} className="mt-4 text-[15px] leading-[1.75] text-[#33415c] first:mt-0">
-            {p}
-          </p>
-        ))}
-        {article.sections.map((s, i) => (
-          <div key={i}>
-            <h2 className="mt-8 text-[17px] font-bold leading-snug text-[#09123c]">{s.heading}</h2>
-            <div className="mt-3 space-y-3 text-[15px] leading-[1.75] text-[#33415c]">
-              {s.paragraphs.map((p, j) => (
-                <p key={j}>{p}</p>
-              ))}
-              {s.listIntro && <p>{s.listIntro}</p>}
-              {s.bullets && (
-                <ul className="list-disc space-y-1 pl-5">
-                  {s.bullets.map((b) => (
-                    <li key={b}>{b}</li>
-                  ))}
-                </ul>
-              )}
-              {s.extraLists?.map((l) => (
-                <div key={l.intro}>
-                  <p>{l.intro}</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5">
-                    {l.bullets.map((b) => (
-                      <li key={b}>{b}</li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-              {s.closing?.map((p, j) => (
-                <p key={j}>{p}</p>
-              ))}
-            </div>
-            <hr className="mt-8 border-[#dce4ea]" />
-          </div>
-        ))}
-      </div>
-    );
+function getArticleBySlug(slug: string | undefined): Blog | undefined {
+  return getArticles().find((a) => a.slug === slug);
+}
+
+function formatDate(iso: string | null | undefined): string | null {
+  if (!iso) return null;
+  try {
+    return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  } catch {
+    return null;
   }
-  return (
-    <div className="mt-8 space-y-5 text-[15px] leading-[1.8] text-[#33415c]">
-      <p className="text-[17px] font-medium text-[#09123c]">{article.excerpt}</p>
-      {article.body.map((p, i) => (
-        <p key={i}>{p}</p>
-      ))}
-    </div>
-  );
 }
 
 export default function BlogPostPage({
@@ -66,7 +25,7 @@ export default function BlogPostPage({
   showBack?: boolean;
 }) {
   const { slug } = useParams();
-  const article = getArticle(slug);
+  const article = getArticleBySlug(slug);
 
   if (!article) {
     return (
@@ -91,7 +50,11 @@ export default function BlogPostPage({
     );
   }
 
-  const related = articles.filter((a) => a.slug !== article.slug).slice(0, 3);
+  const related = getArticles()
+    .filter((a) => a.slug !== article.slug)
+    .slice(0, 3);
+
+  const publishedDate = formatDate(article.publishedAt);
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-[#cc091b]/10 selection:text-[#cc091b]">
@@ -105,13 +68,13 @@ export default function BlogPostPage({
               className="inline-flex items-center gap-2 rounded-full border border-[#c8dce8] bg-white px-4 py-2 text-[13px] font-semibold text-[#09123c] transition-colors hover:border-[#8ab5d6]"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-            More articles
-          </Link>
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+              More articles
+            </Link>
           )}
 
-          {/* Headline block — centered, per Figma */}
+          {/* Headline block — centered */}
           <div className="mx-auto mt-2 max-w-[736px] text-center">
             <h1 className="text-[32px] font-semibold leading-[1.15] tracking-[-0.02em] text-[#09123c] sm:text-[44px]">
               {article.title}
@@ -119,19 +82,22 @@ export default function BlogPostPage({
             <p className="mx-auto mt-4 max-w-[678px] text-[15px] leading-[1.6] text-[#4a556a] sm:text-[17px]">
               {article.excerpt}
             </p>
-            {article.date && (
-              <p className="mt-3 text-[12px] font-medium tracking-wide text-[#6b8aa0]">{article.date}</p>
+            {publishedDate && (
+              <p className="mt-3 text-[12px] font-medium tracking-wide text-[#6b8aa0]">{publishedDate}</p>
             )}
           </div>
 
-          {/* Featured image — full container width, per Figma */}
+          {/* Featured image — full container width */}
           <div className="mt-8 overflow-hidden rounded-xl">
-            <img src={article.image} alt={article.title} className="aspect-[1360/480] w-full object-cover" />
+            <img src={article.featuredImage} alt={article.title} className="aspect-[1360/480] w-full object-cover" />
           </div>
 
-          {/* Reading column — per Figma */}
-          <div className="mt-8">
-            <ArticleBody article={article} />
+          {/* Reading column */}
+          <div className="mx-auto mt-8 max-w-[768px]">
+            <div
+              className="prose-sm text-[15px] leading-[1.8] text-[#33415c] [&_a]:text-[#cc091b] [&_a]:underline [&_blockquote]:border-l-2 [&_blockquote]:border-[#c8dce8] [&_blockquote]:pl-4 [&_blockquote]:italic [&_h2]:mt-8 [&_h2]:text-[18px] [&_h2]:font-bold [&_h2]:text-[#09123c] [&_img]:max-w-full [&_img]:rounded-lg [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_hr]:my-8 [&_hr]:border-[#dce4ea]"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
           </div>
 
           {showRelated && related.length > 0 && (
